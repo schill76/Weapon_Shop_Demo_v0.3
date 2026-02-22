@@ -63,10 +63,17 @@ function checkMaterialUnlocks() { for (let t = 3; t <= 9; t++) { if (state.mater
 function buyMaterial(id, qty) { const cost = MATERIALS[id].cost * qty; if (state.gold < cost) return; state.gold -= cost; state.materials[id] += qty; flashGold(); render(); }
 
 // ===== QUALITY =====
-function rollQuality(weaponId) {
-    const level = getMasteryLevel(weaponId), up = level >= 6, roll = Math.random() * 100;
+function rollOneQuality(up) {
+    const roll = Math.random() * 100;
     if (up) { if (roll < 0.2) return 'legendary'; if (roll < 2.1) return 'epic'; if (roll < 8.0) return 'rare'; if (roll < 30.0) return 'uncommon'; return 'common'; }
     if (roll < 1.0) return 'epic'; if (roll < 5.0) return 'rare'; if (roll < 20.0) return 'uncommon'; return 'common';
+}
+function rollQuality(weaponId) {
+    const bonus = getMasteryBonus(weaponId), up = !!bonus.qualityUp;
+    const q1 = rollOneQuality(up);
+    if (!bonus.doubleRoll) return q1;
+    const q2 = rollOneQuality(up);
+    return QUALITY_ORDER.indexOf(q1) >= QUALITY_ORDER.indexOf(q2) ? q1 : q2;
 }
 
 // ===== STASH =====
@@ -82,14 +89,11 @@ function getTotalStash() { let t = 0; for (const q of Object.values(state.weapon
 // ===== MASTERY =====
 function getMasteryLevel(wId) { const wd = getWeaponData(wId); if (!wd) return 0; return Math.min(10, Math.floor((state.mastery[wId] || 0) / TIER_CONFIG[wd.tier].improvementEvery)); }
 function getMasteryPriceMultiplier(wId) { const l = getMasteryLevel(wId); return l === 0 ? 1.0 : MASTERY_SCHEDULE[l].priceMultiplier; }
-function hasSpeedBonus(wId) { return getMasteryLevel(wId) >= 7; }
+function getMasteryBonus(wId) { const l = getMasteryLevel(wId); return l === 0 ? {} : MASTERY_SCHEDULE[l]; }
 function getSellPrice(wId, q = 'common') { const wd = getWeaponData(wId); if (!wd) return 0; return Math.floor(wd.baseSellPrice * getMasteryPriceMultiplier(wId) * QUALITIES[q].multiplier); }
 function getEffectiveRecipe(wId) {
-    const wd = getWeaponData(wId); if (!wd) return {}; const lv = getMasteryLevel(wId), recipe = { ...wd.recipe }; if (lv < 3) return recipe;
-    const s = Object.keys(recipe).sort((a, b) => { if (recipe[b] !== recipe[a]) return recipe[b] - recipe[a]; return MATERIALS[b].cost - MATERIALS[a].cost; });
-    if (lv >= 3 && s.length > 0) recipe[s[0]] = Math.max(1, recipe[s[0]] - 1);
-    if (lv >= 5) { const i = s.length > 1 ? 1 : 0; recipe[s[i]] = Math.max(1, recipe[s[i]] - 1); }
-    if (lv >= 9 && s.length > 0) recipe[s[0]] = Math.max(1, recipe[s[0]] - 1); return recipe;
+    const wd = getWeaponData(wId); if (!wd) return {};
+    return { ...wd.recipe };
 }
 function getNextBonusInfo(wId) {
     const lv = getMasteryLevel(wId); if (lv >= 10) return null; const wd = getWeaponData(wId); if (!wd) return null;
@@ -129,12 +133,20 @@ function craftWeaponN(wId, n) {
     let lastQuality = 'common';
     for (let i = 0; i < actual; i++) {
         const recipe = getEffectiveRecipe(wId); // re-compute each time (mastery may change)
-        for (const [m, q] of Object.entries(recipe)) state.materials[m] -= q;
+        const bonus = getMasteryBonus(wId);
+        const isFree = bonus.freeChance && Math.random() < bonus.freeChance;
+        if (!isFree) { for (const [m, q] of Object.entries(recipe)) state.materials[m] -= q; }
+        else showToast(`✨ Free craft! (${wd.name})`, 'unlock');
         if (!state.mastery[wId]) state.mastery[wId] = 0; state.mastery[wId]++; state.totalCrafted++;
         checkMaterialUnlocks();
         const quality = rollQuality(wId); addToStash(wId, quality); lastQuality = quality;
         const q2 = QUALITIES[quality];
         if (quality !== 'common') showToast(`✨ ${q2.name} ${wd.name}!`, 'craft');
+        // Double craft bonus
+        if (bonus.doubleChance && Math.random() < bonus.doubleChance) {
+            addToStash(wId, quality);
+            showToast(`⚒️ Double craft! (${wd.name})`, 'craft');
+        }
         const tc = TIER_CONFIG[wd.tier], lv = getMasteryLevel(wId);
         if (state.mastery[wId] % tc.improvementEvery === 0 && lv <= 10) {
             if (lv === 10) showToast(`✦ ${wd.name} MASTER FORGED!`, 'unlock');
