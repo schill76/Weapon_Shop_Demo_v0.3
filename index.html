@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weapon Shop — Forge & Sell</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="title-area">
+                <h1>⚒️ The Weapon Shop</h1>
+                <p class="subtitle">Forge · Master · Profit</p>
+            </div>
+            <div class="stats-bar">
+                <div class="gold-display" id="gold-display">
+                    <span class="gold-icon">💰</span>
+                    <span class="gold-amount" id="gold-amount">100</span>
+                    <span class="gold-label">gold</span>
+                </div>
+                <div class="stat-pill">🔨 <span id="total-crafted">0</span></div>
+                <div class="stat-pill">📈 <span id="total-earned">0</span>g</div>
+                <div class="stat-pill">📜 <span id="blueprint-count">0</span></div>
+                <div class="stat-pill mw-pill">✦ <span id="mw-points">0</span></div>
+                <div class="save-load-btns">
+                    <button class="btn-save" onclick="saveGame()">💾 Save</button>
+                    <button class="btn-load" onclick="loadGame()">📂 Load</button>
+                </div>
+            </div>
+        </header>
+
+        <section class="quest-board">
+            <div class="quest-board-header">
+                <h2>📜 Quest Board</h2>
+            </div>
+            <div class="quest-slots" id="quest-slots"></div>
+        </section>
+
+        <main class="game-grid">
+            <section class="panel material-panel">
+                <div class="panel-header">
+                    <h2>🪨 Materials</h2>
+                </div>
+                <div class="panel-body" id="material-shop"></div>
+                <div class="panel-header inventory-header">
+                    <h2>📦 Inventory</h2>
+                </div>
+                <div class="panel-body" id="inventory"></div>
+            </section>
+
+            <section class="panel crafting-panel">
+                <div class="panel-header">
+                    <h2>🔨 Workshop</h2>
+                </div>
+                <div class="group-tabs" id="group-tabs">
+                    <button class="group-tab active" data-group="weapons" onclick="setGroup('weapons')">⚔️
+                        Weapons</button>
+                    <button class="group-tab" data-group="armor" onclick="setGroup('armor')">🛡️ Armor</button>
+                    <button class="group-tab" data-group="accessories" onclick="setGroup('accessories')">💎
+                        Accessories</button>
+                </div>
+                <div class="category-tabs" id="category-tabs"></div>
+                <div class="panel-body crafting-body" id="crafting-area"></div>
+            </section>
+
+            <section class="panel right-panel">
+                <div class="right-tab-bar">
+                    <button class="right-tab active" data-rtab="shop" onclick="setRightTab('shop')">🏪 Shop</button>
+                    <button class="right-tab" data-rtab="fusion" onclick="setRightTab('fusion')">🔀 Fusion</button>
+                    <button class="right-tab" data-rtab="masterwork" onclick="setRightTab('masterwork')">✦ MW</button>
+                    <span class="shop-count" id="shop-count">0 items</span>
+                </div>
+                <div class="panel-body right-content" id="right-content"></div>
+                <div class="panel-header">
+                    <h2>📜 Sales Log</h2>
+                </div>
+                <div class="panel-body sales-log-body" id="sales-log">
+                    <p class="log-empty">No sales yet...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="chest-overlay" id="chest-modal" style="display:none;">
+        <div class="chest-modal">
+            <h2 id="chest-title"></h2>
+            <div class="chest-rewards" id="chest-rewards"></div>
+            <button class="btn-chest-collect" onclick="closeChestModal()">Collect & Close</button>
+        </div>
+    </div>
+    <div class="toast-container" id="toast-container"></div>
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>
