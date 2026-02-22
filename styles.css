@@ -1231,6 +1231,18 @@ body {
     margin-bottom: 20px
 }
 
+.quest-bp-tag {
+    font-size: .6rem;
+    font-weight: 600;
+    opacity: .7;
+    font-family: var(--font-body)
+}
+
+.quest-bp-tag.bp-done {
+    color: var(--emerald);
+    opacity: 1
+}
+
 .chest-reward-item {
     display: flex;
     align-items: center;
