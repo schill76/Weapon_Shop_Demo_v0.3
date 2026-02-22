@@ -438,15 +438,22 @@ function renderQuests() {
     c.innerHTML = state.quests.map((q, i) => {
         if (!q) return '<div class="quest-card quest-empty"><div class="quest-label">Generating...</div></div>';
         const w = WEAPONS[q.targetWeaponId], cfg = QUEST_CONFIG[q.chestTier], pp = Math.min(100, (q.progress / q.targetCount) * 100);
+        const bp = getBpProgress(q.chestTier), bpDone = bp.owned === bp.total;
+        const bpTag = `<span class="quest-bp-tag ${bpDone ? 'bp-done' : ''}">📜 ${bp.owned}/${bp.total}</span>`;
         if (q.status === 'active') {
             const el = (Date.now() - q.acceptedAt) / 1000, rem = Math.max(0, Math.ceil(q.timeLimit - el)), tp = Math.max(0, (rem / q.timeLimit) * 100);
             const catLabel = CAT[w.category]?.label || w.category;
-            return `<div class="quest-card quest-active" style="--quest-color:${cfg.color}"><div class="quest-tier">${cfg.icon} ${cfg.label}</div><div class="quest-desc">Forge ${q.targetCount}× ${w.name}</div><div class="quest-cat">${catLabel}</div><div class="quest-progress-row"><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pp}%"></div></div><span>${q.progress}/${q.targetCount}</span></div><div class="quest-timer ${rem <= 15 ? 'urgent' : ''}"><div class="quest-timer-bar"><div class="quest-timer-fill" style="width:${tp}%"></div></div><span>${rem}s</span></div></div>`;
+            return `<div class="quest-card quest-active" style="--quest-color:${cfg.color}"><div class="quest-tier">${cfg.icon} ${cfg.label} ${bpTag}</div><div class="quest-desc">Forge ${q.targetCount}× ${w.name}</div><div class="quest-cat">${catLabel}</div><div class="quest-progress-row"><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pp}%"></div></div><span>${q.progress}/${q.targetCount}</span></div><div class="quest-timer ${rem <= 15 ? 'urgent' : ''}"><div class="quest-timer-bar"><div class="quest-timer-fill" style="width:${tp}%"></div></div><span>${rem}s</span></div></div>`;
         }
-        if (q.status === 'completed') return `<div class="quest-card quest-completed" style="--quest-color:${cfg.color}"><div class="quest-tier">${cfg.icon} ${cfg.label}</div><div class="quest-desc">✅ Complete!</div><button class="btn-quest-open" onclick="openChest(${i})">Open Chest ${cfg.icon}</button></div>`;
-        if (q.status === 'failed') { const cl = Math.max(0, Math.ceil(QUEST_COOLDOWN - (Date.now() - q.failedAt) / 1000)); return `<div class="quest-card quest-failed"><div class="quest-tier">❌ Failed</div><div class="quest-desc">New in ${cl}s</div></div>`; }
+        if (q.status === 'completed') return `<div class="quest-card quest-completed" style="--quest-color:${cfg.color}"><div class="quest-tier">${cfg.icon} ${cfg.label} ${bpTag}</div><div class="quest-desc">✅ Complete!</div><button class="btn-quest-open" onclick="openChest(${i})">Open Chest ${cfg.icon}</button></div>`;
+        if (q.status === 'failed') { const cl = Math.max(0, Math.ceil(QUEST_COOLDOWN - (Date.now() - q.failedAt) / 1000)); return `<div class="quest-card quest-failed"><div class="quest-tier">❌ Failed ${bpTag}</div><div class="quest-desc">New in ${cl}s</div></div>`; }
         return '';
     }).join('');
+}
+function getBpProgress(chestTier) {
+    const [min, max] = CHEST_LOOT[chestTier].bpTiers;
+    const all = Object.keys(ALTERNATE_DATA).filter(id => { const t = ALTERNATE_DATA[id].tier; return t >= min && t <= max; });
+    return { owned: all.filter(id => state.blueprints.has(id)).length, total: all.length };
 }
 function renderChestModal() {
     const modal = document.getElementById('chest-modal'); if (!modal) return; const i = state.activeChestSlot;
