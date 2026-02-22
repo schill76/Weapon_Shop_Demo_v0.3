@@ -40,16 +40,16 @@ const QUALITIES = {
 const QUALITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 const MASTERY_SCHEDULE = {
-    1: { priceMultiplier: 1.10, matReduce: null, qualityUp: false, label: '+10% sell price' },
-    2: { priceMultiplier: 1.20, matReduce: null, qualityUp: false, label: '+20% sell price' },
-    3: { priceMultiplier: 1.20, matReduce: 'first', qualityUp: false, label: '−1 most used material' },
-    4: { priceMultiplier: 1.30, matReduce: null, qualityUp: false, label: '+30% sell price' },
-    5: { priceMultiplier: 1.30, matReduce: 'second', qualityUp: false, label: '−1 next material' },
-    6: { priceMultiplier: 1.40, matReduce: null, qualityUp: false, label: '+40% sell price' },
-    7: { priceMultiplier: 1.40, matReduce: null, qualityUp: true, label: 'Better quality crafts' },
-    8: { priceMultiplier: 1.50, matReduce: null, qualityUp: true, label: '+50% sell price' },
-    9: { priceMultiplier: 1.50, matReduce: 'third', qualityUp: true, label: '−1 most used again' },
-    10: { priceMultiplier: 1.75, matReduce: null, qualityUp: true, label: '✦ Master Forged (+75%)' },
+    1: { priceMultiplier: 1.10, doubleChance: 0, qualityUp: false, freeChance: 0, doubleRoll: false, label: '+10% sell price' },
+    2: { priceMultiplier: 1.20, doubleChance: 0, qualityUp: false, freeChance: 0, doubleRoll: false, label: '+20% sell price' },
+    3: { priceMultiplier: 1.20, doubleChance: 0.05, qualityUp: false, freeChance: 0, doubleRoll: false, label: '5% chance to craft double' },
+    4: { priceMultiplier: 1.30, doubleChance: 0.05, qualityUp: false, freeChance: 0, doubleRoll: false, label: '+30% sell price' },
+    5: { priceMultiplier: 1.30, doubleChance: 0.05, qualityUp: true, freeChance: 0, doubleRoll: false, label: 'Better quality crafts' },
+    6: { priceMultiplier: 1.40, doubleChance: 0.05, qualityUp: true, freeChance: 0, doubleRoll: false, label: '+40% sell price' },
+    7: { priceMultiplier: 1.40, doubleChance: 0.05, qualityUp: true, freeChance: 0.05, doubleRoll: false, label: '5% chance for free craft' },
+    8: { priceMultiplier: 1.50, doubleChance: 0.05, qualityUp: true, freeChance: 0.05, doubleRoll: false, label: '+50% sell price' },
+    9: { priceMultiplier: 1.50, doubleChance: 0.05, qualityUp: true, freeChance: 0.05, doubleRoll: true, label: 'Roll quality twice, take best' },
+    10: { priceMultiplier: 1.75, doubleChance: 0.05, qualityUp: true, freeChance: 0.05, doubleRoll: true, label: '✦ Master Forged (+75%)' },
 };
 
 const GROUPS = { weapons: '⚔️ Weapons', armor: '🛡️ Armor', accessories: '💎 Accessories' };
